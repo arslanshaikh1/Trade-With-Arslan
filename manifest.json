@@ -4,9 +4,9 @@
   "display": "standalone",
   "name": "Trade With Arslan",
   "orientation": "any",
-  "scope": "/",
-  "short_name": "TradeArslan",
-  "start_url": "/",
+  "scope": "/Trade-With-Arslan/",
+  "short_name": "Trade With Arslan",
+  "start_url": "/Trade-With-Arslan/",
   "theme_color": "#ffffff",
   "description": "Official Option Trading Academy App",
   "icons": [
