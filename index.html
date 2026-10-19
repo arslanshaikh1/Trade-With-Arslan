@@ -42,38 +42,102 @@
         .auth-tab-btn { flex: 1; background: transparent; border: none; color: var(--text-sub); padding: 10px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
         .auth-tab-btn.active { background: #1e293b; color: var(--accent-blue); border: 1px solid var(--card-border); }
 
-        /* HEADER & NAVIGATION */
-        .app-header { background: #0f172a; border-bottom: 1px solid var(--card-border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .brand-box { display: flex; align-items: center; gap: 12px; }
-        .brand-logo-img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
-        .brand-info h1 { font-size: 16px; font-weight: 800; color: #fff; }
+        /* HEADER & NAVIGATION (FIXED FOR MOBILE OVERLAP) */
+        .app-header { 
+            background: #0f172a; 
+            border-bottom: 1px solid var(--card-border); 
+            padding: 12px 16px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 12px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .app-header {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 12px 24px;
+            }
+        }
+
+        .brand-box { display: flex; align-items: center; gap: 12px; width: 100%; }
+        .brand-logo-img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); flex-shrink: 0; }
+        .brand-info h1 { font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2; }
         .brand-info p { font-size: 11px; color: var(--text-sub); }
 
-        .nav-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 4px; align-items: center; }
-        .tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-sub); padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: all 0.2s; }
+        .nav-tabs { 
+            display: flex; 
+            gap: 8px; 
+            overflow-x: auto; 
+            padding: 4px 0; 
+            align-items: center; 
+            width: 100%; 
+            scrollbar-width: none; 
+        }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+
+        .tab-btn { background: #1e293b; border: 1px solid var(--card-border); color: var(--text-sub); padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
         .tab-btn:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
-        .tab-btn.active { background: #1e293b; color: var(--accent-blue); border-color: #334155; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .tab-btn.active { background: #334155; color: var(--accent-blue); border-color: var(--accent-blue); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
         .btn-admin-tab { background: rgba(251, 191, 36, 0.15); color: var(--accent-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
         .btn-logout-tab { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); font-weight: bold; }
 
-        .main-container { max-width: 1200px; margin: 0 auto; padding: 24px; width: 100%; flex: 1; }
+        .main-container { max-width: 1200px; margin: 0 auto; padding: 16px; width: 100%; flex: 1; }
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
 
-        .hero-banner { background: linear-gradient(135deg, #1e1b4b, #0f172a, #152035); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
-        .hero-content h2 { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+        /* HERO BANNER (FIXED LOGO CUTTING) */
+        .hero-banner { 
+            background: linear-gradient(135deg, #1e1b4b, #0f172a, #152035); 
+            border: 1px solid var(--card-border); 
+            border-radius: 20px; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column-reverse; 
+            align-items: center; 
+            gap: 16px; 
+            margin-bottom: 20px; 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        @media (min-width: 600px) {
+            .hero-banner {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        .hero-content h2 { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 6px; }
         .hero-content h2 span { color: var(--accent-blue); }
         .hero-content p { font-size: 12px; color: var(--text-sub); max-width: 600px; line-height: 1.5; margin-bottom: 12px; }
-        .hero-stats { display: flex; gap: 12px; }
+        .hero-stats { display: flex; gap: 8px; flex-wrap: wrap; }
         .stat-pill { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; }
-        .hero-img-box { width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--accent-gold); overflow: hidden; flex-shrink: 0; }
-        .hero-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .hero-img-box { 
+            width: 110px; 
+            height: 110px; 
+            border-radius: 50%; 
+            border: 3px solid var(--accent-gold); 
+            overflow: hidden; 
+            flex-shrink: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+        }
+        .hero-img-box img { width: 100%; height: 100%; object-fit: contain; }
 
         .dash-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin-bottom: 16px; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
 
         .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 16px; }
         .course-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; }
@@ -117,7 +181,7 @@
     <!-- MANDATORY STUDENT AUTHENTICATION MODAL -->
     <div id="authModal">
         <div class="auth-card">
-            <img src="logo.png" alt="Logo" class="auth-logo">
+            <img src="logo.png" alt="Logo" class="auth-logo" onerror="this.src='https://via.placeholder.com/64'">
             <h2 style="color:#fff; font-size:18px; margin-bottom:4px;">Trade With Arslan Pro 🐅</h2>
             <p style="font-size:12px; color:var(--text-sub); margin-bottom:16px;">Option King & Mentorship Student Portal</p>
             
@@ -234,7 +298,7 @@
     <!-- HEADER -->
     <header class="app-header">
         <div class="brand-box">
-            <img src="logo.png" alt="Logo" class="brand-logo-img">
+            <img src="logo.png" alt="Logo" class="brand-logo-img" onerror="this.src='https://via.placeholder.com/44'">
             <div class="brand-info">
                 <h1>Trade With Arslan Pro 🐅</h1>
                 <p>Option King & Student Learning Portal</p>
@@ -270,7 +334,7 @@
                     </div>
                 </div>
                 <div class="hero-img-box">
-                    <img src="logo.png" alt="Trade With Arslan Logo">
+                    <img src="logo.png" alt="Trade With Arslan Logo" onerror="this.src='https://via.placeholder.com/110'">
                 </div>
             </div>
 
@@ -693,6 +757,16 @@
         let portfolioBalance = 100000;
         let currentUser = null;
 
+        // AUTOMATIC PERSISTENT SESSION CHECK ON PAGE LOAD
+        document.addEventListener("DOMContentLoaded", function() {
+            let activeUserSession = localStorage.getItem('activeStudentSession');
+            if (activeUserSession) {
+                currentUser = JSON.parse(activeUserSession);
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('recStudent').innerText = currentUser.name;
+            }
+        });
+
         function switchAuthMode(mode) {
             if(mode === 'login') {
                 document.getElementById('loginFormSection').style.display = 'block';
@@ -707,7 +781,7 @@
             }
         }
 
-        // REAL SIGN-UP SYSTEM
+        // REAL SIGN-UP SYSTEM (PERSISTENT LOGGED IN)
         function handleSignup() {
             let name = document.getElementById('signupName').value.trim();
             let phone = document.getElementById('signupPhone').value.trim();
@@ -725,6 +799,7 @@
 
             let userData = { name: name, phone: phone, pass: pass };
             localStorage.setItem('user_' + phone, JSON.stringify(userData));
+            localStorage.setItem('activeStudentSession', JSON.stringify(userData)); // Save Session
             currentUser = userData;
 
             document.getElementById('authModal').style.display = 'none';
@@ -732,7 +807,7 @@
             alert(`🎉 Account Successfully Created! Welcome to Trade With Arslan Portal, ${name}!`);
         }
 
-        // REAL LOGIN SYSTEM
+        // REAL LOGIN SYSTEM (PERSISTENT LOGGED IN)
         function handleLogin() {
             let phone = document.getElementById('loginUser').value.trim();
             let pass = document.getElementById('loginPass').value.trim();
@@ -755,6 +830,7 @@
             }
 
             currentUser = parsedUser;
+            localStorage.setItem('activeStudentSession', JSON.stringify(parsedUser)); // Save Session
             document.getElementById('authModal').style.display = 'none';
             document.getElementById('recStudent').innerText = parsedUser.name;
             alert(`🎉 Welcome Back, ${parsedUser.name}! Portal Unlocked.`);
@@ -764,6 +840,7 @@
         function handleUserLogout() {
             if(confirm("Kya aap sach me Log Out karna chahte hain?")) {
                 currentUser = null;
+                localStorage.removeItem('activeStudentSession'); // Clear Session
                 document.getElementById('authModal').style.display = 'flex';
                 document.getElementById('signupName').value = '';
                 document.getElementById('signupPhone').value = '';
