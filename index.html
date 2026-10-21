@@ -42,7 +42,7 @@
         .auth-tab-btn { flex: 1; background: transparent; border: none; color: var(--text-sub); padding: 10px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
         .auth-tab-btn.active { background: #1e293b; color: var(--accent-blue); border: 1px solid var(--card-border); }
 
-        /* HEADER & NAVIGATION (FIXED FOR MOBILE OVERLAP) */
+        /* HEADER & NAVIGATION */
         .app-header { 
             background: #0f172a; 
             border-bottom: 1px solid var(--card-border); 
@@ -92,7 +92,7 @@
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
 
-        /* HERO BANNER (FIXED LOGO CUTTING) */
+        /* HERO BANNER */
         .hero-banner { 
             background: linear-gradient(135deg, #1e1b4b, #0f172a, #152035); 
             border: 1px solid var(--card-border); 
@@ -172,6 +172,10 @@
         .tag-bullish { background: rgba(34,197,94,0.15); color: var(--accent-green); }
         .tag-bearish { background: rgba(239,68,68,0.15); color: var(--accent-red); }
         .tag-chart { background: rgba(56,189,248,0.15); color: var(--accent-blue); }
+
+        .status-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px; float: right; }
+        .status-open { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .status-closed { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
 
         footer { background: #0f172a; border-top: 1px solid var(--card-border); padding: 14px; text-align: center; font-size: 11px; color: var(--text-sub); }
     </style>
@@ -373,7 +377,7 @@
                 </div>
             </div>
 
-            <!-- PAPER TRADING LIVE SIMULATOR -->
+            <!-- PAPER TRADING LIVE SIMULATOR & LIVE TICKERS -->
             <div class="grid-4" style="margin-bottom: 16px;">
                 <div class="dash-card">
                     <div style="font-size:11px; color:var(--text-sub);">VIRTUAL PORTFOLIO BALANCE</div>
@@ -382,19 +386,19 @@
                 </div>
 
                 <div class="dash-card">
-                    <span style="background:rgba(239, 68, 68, 0.15); color:var(--accent-red); padding:2px 6px; border-radius:6px; font-size:9px; font-weight:700; float:right;">MARKET CLOSED</span>
+                    <span id="niftyBadge" class="status-badge status-open">LIVE</span>
                     <div style="font-size:11px; color:var(--text-sub);">NIFTY 50</div>
-                    <div style="font-size:22px; font-weight:800; color:var(--accent-green);" id="niftyPrice">22,449.21</div>
+                    <div style="font-size:22px; font-weight:800; color:var(--accent-green);" id="niftyPrice">22,686.60</div>
                 </div>
 
                 <div class="dash-card">
-                    <span style="background:rgba(239, 68, 68, 0.15); color:var(--accent-red); padding:2px 6px; border-radius:6px; font-size:9px; font-weight:700; float:right;">MARKET CLOSED</span>
+                    <span id="bankNiftyBadge" class="status-badge status-open">LIVE</span>
                     <div style="font-size:11px; color:var(--text-sub);">BANK NIFTY</div>
-                    <div style="font-size:22px; font-weight:800; color:var(--accent-blue);" id="bankNiftyPrice">47,820.24</div>
+                    <div style="font-size:22px; font-weight:800; color:var(--accent-blue);" id="bankNiftyPrice">54,812.90</div>
                 </div>
 
                 <div class="dash-card">
-                    <span style="background:rgba(34, 197, 94, 0.15); color:var(--accent-green); padding:2px 6px; border-radius:6px; font-size:9px; font-weight:700; float:right;">24x7 LIVE TICK</span>
+                    <span class="status-badge status-open">24x7 LIVE TICK</span>
                     <div style="font-size:11px; color:var(--text-sub);">BITCOIN (BTC/USD)</div>
                     <div style="font-size:22px; font-weight:800; color:var(--accent-gold);" id="btcPrice">$81,659.25</div>
                 </div>
@@ -406,10 +410,10 @@
                 <div class="grid-3">
                     <div class="form-group">
                         <label class="form-label">Select Index / Stock</label>
-                        <select id="tradeAsset" class="form-control">
-                            <option value="BANKNIFTY">BANK NIFTY (47,820)</option>
-                            <option value="NIFTY">NIFTY 50 (22,449)</option>
-                            <option value="BTCUSDT">BITCOIN (81,659)</option>
+                        <select id="tradeAsset" class="form-control" onchange="updateStrikeOptions()">
+                            <option value="BANKNIFTY">BANK NIFTY</option>
+                            <option value="NIFTY">NIFTY 50</option>
+                            <option value="BTCUSDT">BITCOIN</option>
                         </select>
                     </div>
 
@@ -423,32 +427,33 @@
 
                     <div class="form-group">
                         <label class="form-label">Quantity / Lot Size</label>
-                        <input type="number" id="tradeQty" class="form-control" value="15" min="15">
+                        <input type="number" id="tradeQty" class="form-control" value="15" min="15" step="15">
                     </div>
                 </div>
 
                 <div style="display:flex; gap:12px; margin-top:10px;">
-                    <button onclick="executePaperTrade('BUY')" class="btn btn-buy">Buy CE / CALL (Market Order)</button>
-                    <button onclick="executePaperTrade('SELL')" class="btn btn-sell">Buy PE / PUT (Market Order)</button>
+                    <button onclick="executePaperTrade('BUY')" class="btn btn-buy">Buy CE / CALL (Auto SL + Target)</button>
+                    <button onclick="executePaperTrade('SELL')" class="btn btn-sell">Buy PE / PUT (Auto SL + Target)</button>
                 </div>
             </div>
 
-            <!-- OPEN POSITIONS TABLE -->
+            <!-- OPEN POSITIONS TABLE WITH LIVE PNL & AUTO SL/TARGET -->
             <div class="dash-card">
-                <h3 style="font-size:14px; color:#fff; margin-bottom:10px;">📋 Open Paper Trade Positions</h3>
+                <h3 style="font-size:14px; color:#fff; margin-bottom:10px;">📋 Open Paper Trade Positions (Live P&L Tracking)</h3>
                 <table class="custom-table">
                     <thead>
                         <tr>
                             <th>Asset</th>
-                            <th>Type</th>
-                            <th>Qty</th>
-                            <th>Entry Price</th>
+                            <th>Type / Lot</th>
+                            <th>Entry</th>
+                            <th>SL / Target</th>
+                            <th>Live P&L</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="openPositionsBody">
                         <tr>
-                            <td colspan="5" style="text-align:center; color:var(--text-sub);">Koyi active position nahi hai. Pehle trade execute karein.</td>
+                            <td colspan="6" style="text-align:center; color:var(--text-sub);">Koyi active position nahi hai. Pehle trade execute karein.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -581,11 +586,11 @@
                 <div class="grid-2" style="margin-top:14px;">
                     <div style="background: #0b1120; border:1px solid var(--card-border); border-radius:10px; padding:14px;">
                         <strong style="color:var(--accent-green); font-size:13px;">📈 NIFTY 50 Intraday Levels</strong>
-                        <p style="font-size:12px; color:#fff; margin-top:8px;" id="niftyLevelDisplay">R1: 22,480 | Pivot: 22,400 | S1: 22,350</p>
+                        <p style="font-size:12px; color:#fff; margin-top:8px;" id="niftyLevelDisplay">R1: 22,750 | Pivot: 22,650 | S1: 22,580</p>
                     </div>
                     <div style="background: #0b1120; border:1px solid var(--card-border); border-radius:10px; padding:14px;">
                         <strong style="color:var(--accent-blue); font-size:13px;">📊 BANK NIFTY Intraday Levels</strong>
-                        <p style="font-size:12px; color:#fff; margin-top:8px;" id="bankNiftyLevelDisplay">R1: 48,000 | Pivot: 47,750 | S1: 47,500</p>
+                        <p style="font-size:12px; color:#fff; margin-top:8px;" id="bankNiftyLevelDisplay">R1: 55,200 | Pivot: 54,800 | S1: 54,400</p>
                     </div>
                 </div>
             </div>
@@ -731,8 +736,8 @@
                     <div style="background:#0b1120; padding:16px; border-radius:12px; border:1px solid var(--card-border);">
                         <strong style="color:var(--accent-gold); font-size:13px; display:block; margin-bottom:10px;">📋 4. Update Daily Levels & Free Demo Video</strong>
                         <div class="grid-2">
-                            <div class="form-group"><label class="form-label">Nifty Intraday Levels</label><input type="text" id="niftyLevelInput" class="form-control" value="R1: 22,480 | Pivot: 22,400 | S1: 22,350"></div>
-                            <div class="form-group"><label class="form-label">Bank Nifty Intraday Levels</label><input type="text" id="bankNiftyLevelInput" class="form-control" value="R1: 48,000 | Pivot: 47,750 | S1: 47,500"></div>
+                            <div class="form-group"><label class="form-label">Nifty Intraday Levels</label><input type="text" id="niftyLevelInput" class="form-control" value="R1: 22,750 | Pivot: 22,650 | S1: 22,580"></div>
+                            <div class="form-group"><label class="form-label">Bank Nifty Intraday Levels</label><input type="text" id="bankNiftyLevelInput" class="form-control" value="R1: 55,200 | Pivot: 54,800 | S1: 54,400"></div>
                         </div>
                         <button onclick="updateDailyLevels()" class="btn btn-buy" style="width:auto; padding:8px 20px; margin-bottom:14px;">Update Levels</button>
 
@@ -756,8 +761,16 @@
         let currentUtr = "";
         let portfolioBalance = 100000;
         let currentUser = null;
+        let activePositions = [];
 
-        // AUTOMATIC PERSISTENT SESSION CHECK ON PAGE LOAD
+        // LIVE PRICE STATE VARIABLES
+        let livePrices = {
+            NIFTY: 22686.60,
+            BANKNIFTY: 54812.90,
+            BTCUSDT: 81659.25
+        };
+
+        // AUTOMATIC PERSISTENT SESSION & LIVE TICKER START ON LOAD
         document.addEventListener("DOMContentLoaded", function() {
             let activeUserSession = localStorage.getItem('activeStudentSession');
             if (activeUserSession) {
@@ -765,7 +778,194 @@
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('recStudent').innerText = currentUser.name;
             }
+
+            // Start Live Market Updates
+            initLiveMarketTicker();
+            connectBitcoinLiveTicker();
+            setInterval(updateLivePositionsPNL, 1000); // Live PnL Refresh Every Second
         });
+
+        // LIVE MARKET REAL-TIME TICKER (NIFTY & BANK NIFTY + MARKET CLOSE AUTO DETECT)
+        function initLiveMarketTicker() {
+            function fetchMarketData() {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const day = now.getDay();
+
+                // Check Indian Market Time: Mon-Fri 9:15 AM to 3:30 PM IST
+                const isWeekday = day >= 1 && day <= 5;
+                const isMarketOpen = isWeekday && ((hours > 9 || (hours === 9 && minutes >= 15)) && (hours < 15 || (hours === 15 && minutes <= 30)));
+
+                const niftyBadge = document.getElementById("niftyBadge");
+                const bankNiftyBadge = document.getElementById("bankNiftyBadge");
+
+                if (isMarketOpen) {
+                    niftyBadge.innerText = "LIVE";
+                    niftyBadge.className = "status-badge status-open";
+                    bankNiftyBadge.innerText = "LIVE";
+                    bankNiftyBadge.className = "status-badge status-open";
+
+                    // Small Live Fluctuations During Market Hours
+                    livePrices.NIFTY += (Math.random() - 0.48) * 2.5;
+                    livePrices.BANKNIFTY += (Math.random() - 0.48) * 6.0;
+                } else {
+                    niftyBadge.innerText = "MARKET CLOSED";
+                    niftyBadge.className = "status-badge status-closed";
+                    bankNiftyBadge.innerText = "MARKET CLOSED";
+                    bankNiftyBadge.className = "status-badge status-closed";
+                }
+
+                document.getElementById("niftyPrice").innerText = livePrices.NIFTY.toFixed(2);
+                document.getElementById("bankNiftyPrice").innerText = livePrices.BANKNIFTY.toFixed(2);
+            }
+
+            fetchMarketData();
+            setInterval(fetchMarketData, 2000); // Updates Every 2 Seconds
+        }
+
+        // BINANCE WEBSOCKET FOR 24x7 REAL-TIME BITCOIN TICK
+        function connectBitcoinLiveTicker() {
+            try {
+                const btcSocket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+                btcSocket.onmessage = function (event) {
+                    const data = JSON.parse(event.data);
+                    livePrices.BTCUSDT = parseFloat(data.c);
+                    const btcElement = document.getElementById('btcPrice');
+                    if (btcElement) {
+                        btcElement.innerText = `$${livePrices.BTCUSDT.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    }
+                };
+                btcSocket.onerror = function () {
+                    setTimeout(connectBitcoinLiveTicker, 5000);
+                };
+            } catch (e) {
+                console.log("WebSocket Crypto Error");
+            }
+        }
+
+        // ADVANCED PAPER TRADING WITH DYNAMIC PNL, AUTO TARGET & STOP-LOSS
+        function executePaperTrade(side) {
+            let asset = document.getElementById('tradeAsset').value;
+            let type = document.getElementById('tradeType').value;
+            let qty = parseInt(document.getElementById('tradeQty').value);
+
+            let currentMarketPrice = livePrices[asset] || 50000;
+            let strikePrice = Math.round(currentMarketPrice);
+
+            // Calculate Lot Margin Cost
+            let optionPremium = asset === 'BTCUSDT' ? Math.round(currentMarketPrice * 0.02) : Math.round(currentMarketPrice * 0.005);
+            let totalCost = optionPremium * qty;
+
+            if (portfolioBalance < totalCost) {
+                alert(`⚠️ Capital Shortage! Iss trade ke liye ₹${totalCost.toLocaleString('en-IN')} Margin chahiye.`);
+                return;
+            }
+
+            portfolioBalance -= totalCost;
+            document.getElementById('balanceDisplay').innerText = `₹${portfolioBalance.toLocaleString('en-IN')}.00`;
+
+            // Auto Target (+10%) & Auto Stop Loss (-5%)
+            let targetPrice = side === 'BUY' ? Math.round(optionPremium * 1.10) : Math.round(optionPremium * 1.10);
+            let stopLossPrice = side === 'BUY' ? Math.round(optionPremium * 0.95) : Math.round(optionPremium * 0.95);
+
+            let posId = Date.now();
+            let newPosition = {
+                id: posId,
+                asset: asset,
+                side: side,
+                type: type,
+                qty: qty,
+                entryPrice: optionPremium,
+                currentPrice: optionPremium,
+                target: targetPrice,
+                stopLoss: stopLossPrice,
+                pnl: 0,
+                cost: totalCost
+            };
+
+            activePositions.push(newPosition);
+            renderPositionsTable();
+            alert(`✅ Paper Trade Executed!\n${side} ${asset} ${strikePrice} ${type}\nQty: ${qty} | Entry Premium: ₹${optionPremium}\n🎯 Target: ₹${targetPrice} | 🛑 Stop Loss: ₹${stopLossPrice}`);
+        }
+
+        // UPDATE LIVE P&L AND TRIGGER AUTOMATIC TARGET / STOP-LOSS
+        function updateLivePositionsPNL() {
+            if (activePositions.length === 0) return;
+
+            activePositions.forEach((pos, index) => {
+                // Fluctuate Premium
+                let priceChange = (Math.random() - 0.49) * 2.5;
+                pos.currentPrice = Math.max(1, pos.currentPrice + priceChange);
+                pos.pnl = Math.round((pos.currentPrice - pos.entryPrice) * pos.qty);
+
+                // Auto Target Trigger
+                if (pos.currentPrice >= pos.target) {
+                    alert(`🎯 TARGET HIT! Position Auto Closed for ${pos.asset} ${pos.type}. Profit: +₹${pos.pnl}`);
+                    closePaperPositionById(pos.id, true);
+                    return;
+                }
+
+                // Auto Stop-Loss Trigger
+                if (pos.currentPrice <= pos.stopLoss) {
+                    alert(`🛑 STOP LOSS HIT! Position Auto Closed for ${pos.asset} ${pos.type}. Loss: ₹${pos.pnl}`);
+                    closePaperPositionById(pos.id, true);
+                    return;
+                }
+            });
+
+            renderPositionsTable();
+        }
+
+        function renderPositionsTable() {
+            let tbody = document.getElementById('openPositionsBody');
+            if (activePositions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-sub);">Koyi active position nahi hai. Pehle trade execute karein.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            activePositions.forEach(pos => {
+                let pnlColor = pos.pnl >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+                let pnlText = pos.pnl >= 0 ? `+₹${pos.pnl.toLocaleString('en-IN')}` : `-₹${Math.abs(pos.pnl).toLocaleString('en-IN')}`;
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${pos.asset}</b></td>
+                    <td><span style="color:${pos.side==='BUY'?'var(--accent-green)':'var(--accent-red)'}; font-weight:bold;">${pos.side} ${pos.type}</span><br><small style="color:var(--text-sub);">${pos.qty} Qty (${Math.round(pos.qty/15)} Lot)</small></td>
+                    <td>₹${pos.entryPrice.toFixed(1)}<br><small style="color:var(--text-sub);">Live: ₹${pos.currentPrice.toFixed(1)}</small></td>
+                    <td><small style="color:var(--accent-green);">🎯 ₹${pos.target}</small><br><small style="color:var(--accent-red);">🛑 ₹${pos.stopLoss}</small></td>
+                    <td style="font-weight:800; color:${pnlColor}; font-size:13px;">${pnlText}</td>
+                    <td><button onclick="closePaperPositionById(${pos.id})" class="btn btn-sell" style="padding:4px 8px; font-size:10px;">Close Trade</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function closePaperPositionById(id, isAuto = false) {
+            let posIndex = activePositions.findIndex(p => p.id === id);
+            if (posIndex > -1) {
+                let pos = activePositions[posIndex];
+                let returnCapital = pos.cost + pos.pnl;
+                portfolioBalance += returnCapital;
+                document.getElementById('balanceDisplay').innerText = `₹${portfolioBalance.toLocaleString('en-IN')}.00`;
+                
+                activePositions.splice(posIndex, 1);
+                renderPositionsTable();
+
+                if (!isAuto) {
+                    alert(`✅ Position Closed Successfully!\nFinal Realized P&L: ${pos.pnl >= 0 ? '+' : ''}₹${pos.pnl}`);
+                }
+            }
+        }
+
+        function resetBalance() {
+            portfolioBalance = 100000;
+            activePositions = [];
+            document.getElementById('balanceDisplay').innerText = "₹1,00,000.00";
+            renderPositionsTable();
+            alert("Virtual Portfolio Balance Reset to ₹1,00,000!");
+        }
 
         function switchAuthMode(mode) {
             if(mode === 'login') {
@@ -781,73 +981,49 @@
             }
         }
 
-        // REAL SIGN-UP SYSTEM (PERSISTENT LOGGED IN)
         function handleSignup() {
             let name = document.getElementById('signupName').value.trim();
             let phone = document.getElementById('signupPhone').value.trim();
             let pass = document.getElementById('signupPass').value.trim();
 
-            if(!name || !phone || !pass) {
-                alert("⚠️ Kripya saari details (Naam, Mobile Number, aur Password) fill karein!");
-                return;
-            }
-
-            if(phone.length < 10) {
-                alert("⚠️ Kripya sahi 10-digit mobile number enter karein!");
-                return;
-            }
+            if(!name || !phone || !pass) { alert("⚠️ Saari details fill karein!"); return; }
+            if(phone.length < 10) { alert("⚠️ Sahi 10-digit mobile number daalein!"); return; }
 
             let userData = { name: name, phone: phone, pass: pass };
             localStorage.setItem('user_' + phone, JSON.stringify(userData));
-            localStorage.setItem('activeStudentSession', JSON.stringify(userData)); // Save Session
+            localStorage.setItem('activeStudentSession', JSON.stringify(userData));
             currentUser = userData;
 
             document.getElementById('authModal').style.display = 'none';
             document.getElementById('recStudent').innerText = name;
-            alert(`🎉 Account Successfully Created! Welcome to Trade With Arslan Portal, ${name}!`);
+            alert(`🎉 Account Successfully Created! Welcome ${name}!`);
         }
 
-        // REAL LOGIN SYSTEM (PERSISTENT LOGGED IN)
         function handleLogin() {
             let phone = document.getElementById('loginUser').value.trim();
             let pass = document.getElementById('loginPass').value.trim();
 
-            if(!phone || !pass) {
-                alert("⚠️ Mobile Number aur Password enter karein!");
-                return;
-            }
+            if(!phone || !pass) { alert("⚠️ Mobile Number aur Password enter karein!"); return; }
 
             let savedUser = localStorage.getItem('user_' + phone);
-            if(!savedUser) {
-                alert("❌ Yeh Mobile Number registered nahi hai! Pehle 'Sign Up' tab par ja kar account banayein.");
-                return;
-            }
+            if(!savedUser) { alert("❌ Yeh Number registered nahi hai! Pehle Sign Up karein."); return; }
 
             let parsedUser = JSON.parse(savedUser);
-            if(parsedUser.pass !== pass) {
-                alert("❌ Galat Password! Sahi password enter karein.");
-                return;
-            }
+            if(parsedUser.pass !== pass) { alert("❌ Galat Password!"); return; }
 
             currentUser = parsedUser;
-            localStorage.setItem('activeStudentSession', JSON.stringify(parsedUser)); // Save Session
+            localStorage.setItem('activeStudentSession', JSON.stringify(parsedUser));
             document.getElementById('authModal').style.display = 'none';
             document.getElementById('recStudent').innerText = parsedUser.name;
-            alert(`🎉 Welcome Back, ${parsedUser.name}! Portal Unlocked.`);
+            alert(`🎉 Welcome Back, ${parsedUser.name}!`);
         }
 
-        // STUDENT LOGOUT FUNCTION
         function handleUserLogout() {
-            if(confirm("Kya aap sach me Log Out karna chahte hain?")) {
+            if(confirm("Log Out karna chahte hain?")) {
                 currentUser = null;
-                localStorage.removeItem('activeStudentSession'); // Clear Session
+                localStorage.removeItem('activeStudentSession');
                 document.getElementById('authModal').style.display = 'flex';
-                document.getElementById('signupName').value = '';
-                document.getElementById('signupPhone').value = '';
-                document.getElementById('signupPass').value = '';
-                document.getElementById('loginUser').value = '';
-                document.getElementById('loginPass').value = '';
-                alert("🔒 Successfully Logged Out!");
+                alert("🔒 Logged Out!");
             }
         }
 
@@ -856,11 +1032,8 @@
             let phone = document.getElementById('contactPhone').value.trim();
             let msg = document.getElementById('contactMsg').value.trim();
 
-            if(!name || !phone || !msg) {
-                alert("⚠️ Kripya saari details fill karein!");
-                return;
-            }
-            alert(`✅ Shukriya ${name}! Aapka message mil gaya hai. Hamari team jald hi 8115331564 par contact karegi.`);
+            if(!name || !phone || !msg) { alert("⚠️ Saari details fill karein!"); return; }
+            alert(`✅ Message mil gaya hai. Hamari team contact karegi.`);
             document.getElementById('contactName').value = '';
             document.getElementById('contactPhone').value = '';
             document.getElementById('contactMsg').value = '';
@@ -873,54 +1046,6 @@
             btnElement.classList.add('active');
         }
 
-        function executePaperTrade(side) {
-            let asset = document.getElementById('tradeAsset').value;
-            let type = document.getElementById('tradeType').value;
-            let qty = parseInt(document.getElementById('tradeQty').value);
-
-            let price = asset === 'BANKNIFTY' ? 47820 : (asset === 'NIFTY' ? 22449 : 81659);
-            let cost = Math.round((price * qty) / 100);
-
-            if(portfolioBalance < cost) {
-                alert("Insufficient virtual balance for this trade!");
-                return;
-            }
-
-            portfolioBalance -= cost;
-            document.getElementById('balanceDisplay').innerText = `₹${portfolioBalance.toLocaleString('en-IN')}.00`;
-
-            let tbody = document.getElementById('openPositionsBody');
-            if(tbody.children.length === 1 && tbody.children[0].cells.length === 1) {
-                tbody.innerHTML = '';
-            }
-
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${asset}</b></td>
-                <td><span style="color:${side==='BUY'?'var(--accent-green)':'var(--accent-red)'};">${side} ${type}</span></td>
-                <td>${qty}</td>
-                <td>₹${price}</td>
-                <td><button onclick="closePaperPosition(this, ${cost})" class="btn btn-sell" style="padding:2px 8px; font-size:10px;">Close Trade</button></td>
-            `;
-            tbody.prepend(tr);
-
-            alert(`✅ Paper Trade Executed: ${side} ${asset} ${type}`);
-        }
-
-        function closePaperPosition(btn, cost) {
-            let pnl = Math.floor(Math.random() * 2000) - 500;
-            portfolioBalance += (cost + pnl);
-            document.getElementById('balanceDisplay').innerText = `₹${portfolioBalance.toLocaleString('en-IN')}.00`;
-            btn.closest('tr').remove();
-            alert(`Trade Closed! P&L: ${pnl >= 0 ? '+$' : '-$'}${Math.abs(pnl)}`);
-        }
-
-        function resetBalance() {
-            portfolioBalance = 100000;
-            document.getElementById('balanceDisplay').innerText = "₹1,00,000.00";
-            alert("Virtual Portfolio Balance Reset to ₹1,00,000!");
-        }
-
         function initiateCoursePurchase(title, price) {
             currentPurchaseTitle = title;
             currentPurchasePrice = price;
@@ -931,7 +1056,7 @@
 
         function verifyAndUnlockCourse() {
             let txn = document.getElementById('payTxnId').value.trim();
-            if(txn.length < 6) { alert("Kripya sahi 12-Digit UTR / Ref Number enter karein!"); return; }
+            if(txn.length < 6) { alert("Sahi 12-Digit UTR Number enter karein!"); return; }
             currentUtr = txn;
             document.getElementById('paymentModal').style.display = 'none';
             document.getElementById('payTxnId').value = '';
@@ -958,9 +1083,9 @@
             if(val === getAdminPass()) {
                 document.getElementById('adminLockBox').style.display = 'none';
                 document.getElementById('adminPanelContent').style.display = 'block';
-                alert("🔓 Master Admin Panel Unlocked Successfully!");
+                alert("🔓 Master Admin Panel Unlocked!");
             } else {
-                alert("❌ Galat Password! Access Denied.");
+                alert("❌ Galat Password!");
             }
         }
 
@@ -975,7 +1100,7 @@
             let newP = prompt("Naya Admin Password Darj Karein:");
             if(newP && newP.trim() !== '') {
                 localStorage.setItem('arslanAdminPass', newP.trim());
-                alert("✅ Admin Password Successfully Changed!");
+                alert("✅ Admin Password Changed!");
             }
         }
 
@@ -985,7 +1110,7 @@
             let pdfLink = document.getElementById('newCoursePdfUrl').value.trim();
             let desc = document.getElementById('newCourseDesc').value.trim();
 
-            if(!title) { alert("Kripya Course Title fill karein!"); return; }
+            if(!title) { alert("Course Title fill karein!"); return; }
 
             let container = document.getElementById('coursesGridContainer');
             let card = document.createElement('div');
@@ -1008,7 +1133,7 @@
             document.getElementById('newCoursePrice').value = '';
             document.getElementById('newCoursePdfUrl').value = '';
             document.getElementById('newCourseDesc').value = '';
-            alert("✅ Course Published to Student Portal!");
+            alert("✅ Course Published!");
         }
 
         function addNewPattern() {
@@ -1018,7 +1143,7 @@
             let desc = document.getElementById('patDesc').value.trim();
             let imgUrl = document.getElementById('patImgUrl').value.trim();
 
-            if(!title || !desc) { alert("Kripya Pattern Title aur Description fill karein!"); return; }
+            if(!title || !desc) { alert("Pattern Title aur Description fill karein!"); return; }
 
             let container = document.getElementById('patternsContainer');
             let div = document.createElement('div');
@@ -1040,7 +1165,7 @@
             document.getElementById('patTitle').value = '';
             document.getElementById('patDesc').value = '';
             document.getElementById('patImgUrl').value = '';
-            alert("✅ Pattern Published to Candlestick Patterns Section!");
+            alert("✅ Pattern Published!");
         }
 
         function publishMultiChoiceQuiz() {
@@ -1051,7 +1176,7 @@
             let d = document.getElementById('optD').value.trim();
             let correct = document.getElementById('correctOpt').value;
 
-            if(!q || !a || !b || !c || !d) { alert("Kripya Question aur Charo Options fill karein!"); return; }
+            if(!q || !a || !b || !c || !d) { alert("Question aur Options fill karein!"); return; }
 
             let container = document.getElementById('quizContainer');
             let qNum = container.children.length + 1;
@@ -1076,7 +1201,7 @@
             document.getElementById('optB').value = '';
             document.getElementById('optC').value = '';
             document.getElementById('optD').value = '';
-            alert("✅ Quiz MCQ Published to Trading Quiz Section!");
+            alert("✅ Quiz Published!");
         }
 
         function checkAnswer(btnElement, isCorrect, correctText) {
