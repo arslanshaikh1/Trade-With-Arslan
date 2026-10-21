@@ -410,7 +410,7 @@
                 <div class="grid-3">
                     <div class="form-group">
                         <label class="form-label">Select Index / Stock</label>
-                        <select id="tradeAsset" class="form-control" onchange="updateStrikeOptions()">
+                        <select id="tradeAsset" class="form-control">
                             <option value="BANKNIFTY">BANK NIFTY</option>
                             <option value="NIFTY">NIFTY 50</option>
                             <option value="BTCUSDT">BITCOIN</option>
@@ -770,6 +770,27 @@
             BTCUSDT: 81659.25
         };
 
+        // LOCALSTORAGE PERSISTENCE FOR POSITIONS & BALANCE
+        function savePositionsToStorage() {
+            localStorage.setItem('activePaperPositions', JSON.stringify(activePositions));
+            localStorage.setItem('virtualBalance', portfolioBalance);
+        }
+
+        function loadPositionsFromStorage() {
+            let savedPos = localStorage.getItem('activePaperPositions');
+            let savedBal = localStorage.getItem('virtualBalance');
+            if (savedPos) {
+                try {
+                    activePositions = JSON.parse(savedPos);
+                } catch(e) { activePositions = []; }
+            }
+            if (savedBal) {
+                portfolioBalance = parseFloat(savedBal);
+                document.getElementById('balanceDisplay').innerText = `₹${portfolioBalance.toLocaleString('en-IN')}.00`;
+            }
+            renderPositionsTable();
+        }
+
         // AUTOMATIC PERSISTENT SESSION & LIVE TICKER START ON LOAD
         document.addEventListener("DOMContentLoaded", function() {
             let activeUserSession = localStorage.getItem('activeStudentSession');
@@ -778,6 +799,9 @@
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('recStudent').innerText = currentUser.name;
             }
+
+            // Load Saved Positions
+            loadPositionsFromStorage();
 
             // Start Live Market Updates
             initLiveMarketTicker();
@@ -866,8 +890,8 @@
             document.getElementById('balanceDisplay').innerText = `₹${portfolioBalance.toLocaleString('en-IN')}.00`;
 
             // Auto Target (+10%) & Auto Stop Loss (-5%)
-            let targetPrice = side === 'BUY' ? Math.round(optionPremium * 1.10) : Math.round(optionPremium * 1.10);
-            let stopLossPrice = side === 'BUY' ? Math.round(optionPremium * 0.95) : Math.round(optionPremium * 0.95);
+            let targetPrice = Math.round(optionPremium * 1.10);
+            let stopLossPrice = Math.round(optionPremium * 0.95);
 
             let posId = Date.now();
             let newPosition = {
@@ -885,6 +909,7 @@
             };
 
             activePositions.push(newPosition);
+            savePositionsToStorage();
             renderPositionsTable();
             alert(`✅ Paper Trade Executed!\n${side} ${asset} ${strikePrice} ${type}\nQty: ${qty} | Entry Premium: ₹${optionPremium}\n🎯 Target: ₹${targetPrice} | 🛑 Stop Loss: ₹${stopLossPrice}`);
         }
@@ -893,7 +918,7 @@
         function updateLivePositionsPNL() {
             if (activePositions.length === 0) return;
 
-            activePositions.forEach((pos, index) => {
+            activePositions.forEach((pos) => {
                 // Fluctuate Premium
                 let priceChange = (Math.random() - 0.49) * 2.5;
                 pos.currentPrice = Math.max(1, pos.currentPrice + priceChange);
@@ -914,6 +939,7 @@
                 }
             });
 
+            savePositionsToStorage();
             renderPositionsTable();
         }
 
@@ -951,6 +977,7 @@
                 document.getElementById('balanceDisplay').innerText = `₹${portfolioBalance.toLocaleString('en-IN')}.00`;
                 
                 activePositions.splice(posIndex, 1);
+                savePositionsToStorage();
                 renderPositionsTable();
 
                 if (!isAuto) {
@@ -962,6 +989,8 @@
         function resetBalance() {
             portfolioBalance = 100000;
             activePositions = [];
+            localStorage.removeItem('activePaperPositions');
+            localStorage.setItem('virtualBalance', 100000);
             document.getElementById('balanceDisplay').innerText = "₹1,00,000.00";
             renderPositionsTable();
             alert("Virtual Portfolio Balance Reset to ₹1,00,000!");
